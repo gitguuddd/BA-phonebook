@@ -79,7 +79,12 @@ class FriendRequestController extends AbstractController
         $sentRequestsReceiverIds = array_column($sentRequests, 'u_id');
         $receivedRequests = $this->friendRequestRepository->findReceivedFriendRequests($user->getId(), true);
         $receivedRequestsSenderIds = array_column($receivedRequests, 'u_id');
-        if (in_array($receiver->getId(), $friendIds)) {
+        if ($receiver->getId() == $user->getId()) {
+            $data = [
+                'errors' => "Can't send a friend request to yourself"
+            ];
+            return new Response(json_encode($data), 400);
+        } elseif (in_array($receiver->getId(), $friendIds)) {
             $data = [
                 'errors' => "Can't send a friend request to an user, who is already a friend"
             ];
@@ -133,6 +138,60 @@ class FriendRequestController extends AbstractController
         $em->flush();
 
         return new Response('OK');
+
+    }
+
+    /**
+     * @Route("/accept/{id}", name="_accept_request", methods={"POST"})
+     * @param EntityManagerInterface $em
+     * @param UserRepository $userRepository
+     * @param FriendRequest $friendRequest
+     * @return Response
+     */
+    public function acceptRequest(EntityManagerInterface $em, UserRepository $userRepository, FriendRequest $friendRequest = null): Response
+    {
+        $user = $this->getUser();
+        if (!$friendRequest) {
+            $data = [
+                'errors' => "Phonebook entry not found"
+            ];
+            return new Response(json_encode($data), 404);
+        } elseif ($user->getId() != $friendRequest->getReceiverId()) {
+            $data = [
+                'errors' => "No permissions to accept this request"
+            ];
+            return new Response(json_encode($data), 400);
+        }
+        $sender = $userRepository->findOneBy(['id' => $friendRequest->getSenderId()]);
+        $user->addMyFriend($sender);
+
+        $em->persist($user);
+        $em->remove($friendRequest);
+        $em->flush();
+
+        return new Response('OK');
+
+    }
+
+    /**
+     * @Route("/inviteOptions", name="_invite_options", methods={"GET"})
+     * @param UserRepository $userRepository
+     * @return Response
+     */
+    public function getInvitationOptions(UserRepository $userRepository): Response
+    {
+        $user = $this->getUser();
+        $friends = $userRepository->findFriends($user->getId());
+        $friendIds = array_column($friends, 'u2_id');
+        $sentRequests = $this->friendRequestRepository->findSentFriendRequests($user->getId(), true);
+        $sentRequestsReceiverIds = array_column($sentRequests, 'u_id');
+        $receivedRequests = $this->friendRequestRepository->findReceivedFriendRequests($user->getId(), true);
+        $receivedRequestsSenderIds = array_column($receivedRequests, 'u_id');
+        $notInIds = array_merge($friendIds, $sentRequestsReceiverIds, $receivedRequestsSenderIds);
+        $notInIds[] = $user->getId();
+        $inviteOptions = $this->friendRequestRepository->findPhonebookInviteOptions($notInIds);
+        $json = $this->serializer->serialize($inviteOptions, 'json', SerializationContext::create()->setGroups(array('list_phonebookInviteOptions')));
+        return new Response($json);
 
     }
 }

@@ -54,12 +54,12 @@ class User implements UserInterface
     private $phonebookEntry;
 
     /**
-     * @ORM\ManyToMany(targetEntity=User::class, mappedBy="myFriends")
+     * @ORM\ManyToMany(targetEntity=User::class, mappedBy="myFriends", cascade={"persist"})
      */
     private $friendsWithMe;
 
     /**
-     * @ORM\ManyToMany(targetEntity=User::class, inversedBy="friendsWithMe")
+     * @ORM\ManyToMany(targetEntity=User::class, inversedBy="friendsWithMe",cascade={"persist"})
      * @ORM\JoinTable(name="friends",
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="friend_user_id", referencedColumnName="id")}

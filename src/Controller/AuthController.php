@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\PhonebookEntry;
 use App\Entity\User;
 use App\Service\ViolationTransformer;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,9 +52,17 @@ class AuthController extends AbstractController
         } else {
             $user->setPassword($encoder->encodePassword($user, $password));
             $em = $this->getDoctrine()->getManager();
-            $em->persist($user);
-            $em->persist($phonebookEntry);
-            $em->flush();
+            try {
+                $em->persist($user);
+                $em->persist($phonebookEntry);
+                $em->flush();
+            } catch (UniqueConstraintViolationException $e) {
+                $data = [
+                    'errors' => "User with the provided email already exists"
+                ];
+                return new Response(json_encode($data), 400);
+            }
+
             return new Response('OK');
         }
     }

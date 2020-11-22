@@ -58,4 +58,18 @@ class FriendRequestRepository extends ServiceEntityRepository
             return $query->execute();
         }
     }
+
+    public function findPhonebookInviteOptions($notInIds): array
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb
+            ->select([
+                'u', 'pe'
+            ])
+            ->from('App\Entity\User', 'u')
+            ->innerJoin('u.phonebookEntry', 'pe')
+            ->where($qb->expr()->notIn('u.id', $notInIds));
+        $query = $qb->getQuery();
+        return $query->execute();
+    }
 }

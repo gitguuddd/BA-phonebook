@@ -113,7 +113,7 @@ class PhonebookEntryController extends AbstractController
         }
         $friends = $userRepository->findFriends($user->getId());
         $friendIds = array_column($friends, 'u2_id');
-        if (!$user->getId() != $phonebookEntry->getUserId() && !in_array($phonebookEntry->getUserId(), $friendIds)) {
+        if ($user->getId() != $phonebookEntry->getUserId() && !in_array($phonebookEntry->getUserId(), $friendIds)) {
             $data = [
                 'errors' => "Cannot view phonebook entries of users that are not friends"
             ];
