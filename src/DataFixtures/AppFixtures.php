@@ -78,7 +78,7 @@ class AppFixtures extends Fixture
             $manager->persist($friendRequest);
 
             if (!is_null($user_4)) {
-                $user_4->addMyFriend($secondaryUsers[2]); // add second user as a second common friend of master user to third user as friend
+                $user_4->addMyFriend($secondaryUsers[2]); // add carried over user as a second mutual friend of master user and third user
                 $user->addMyFriend($user_4); // add carried over user as a friend to master user
                 $manager->persist($user_4);
             }

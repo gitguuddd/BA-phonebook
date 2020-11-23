@@ -14,9 +14,9 @@ class PhonebookEntryControllerTest extends WebTestCase
         $authFetcher = new AuthorizedClientFetcher();
         $client = $authFetcher->createAuthorizedClient();
         $client->request('GET', '/api/phonebookEntries/');
-        $entries = json_decode($client->getResponse()->getContent())[0];
+        $entries = json_decode($client->getResponse()->getContent());
 
-        $this->assertCount(4, $entries->my_friends); //Contains exactly 4 friend associations
+        $this->assertCount(4, $entries); //Contains exactly 4 friend associations
     }
 
     public function testCreate()
@@ -128,12 +128,25 @@ class PhonebookEntryControllerTest extends WebTestCase
         $authFetcher = new AuthorizedClientFetcher();
         $client = $authFetcher->createAuthorizedClient();
         $client->request('GET', '/api/phonebookEntries/');
-        $entries = json_decode($client->getResponse()->getContent())[0];
-        $this->assertCount(4, $entries->my_friends); //Contains exactly 4 friend associations
+        $entries = json_decode($client->getResponse()->getContent());
+        $this->assertCount(4, $entries); //Contains exactly 4 friend associations
         $client->request('POST', '/api/phonebookEntries/stopSharing/2');
         $this->assertTrue($client->getResponse()->isSuccessful()); //Sharing stopped successfully
         $client->request('GET', '/api/phonebookEntries/');
-        $entries = json_decode($client->getResponse()->getContent())[0];
-        $this->assertCount(3, $entries->my_friends); //Contains exactly 3 friend associations
+        $entries = json_decode($client->getResponse()->getContent());
+        $this->assertCount(3, $entries); //Contains exactly 3 friend associations
+    }
+
+    public function testGetPersonal()
+    {
+        $authFetcher = new AuthorizedClientFetcher();
+        $client = $authFetcher->createAuthorizedClient();
+        $client->request('GET', '/api/phonebookEntries/getPersonal');
+        $response = (array)json_decode($client->getResponse()->getContent());
+        $this->assertEquals('Jonathan', $response['first_name']); //Fetches correct personal entry
+        $client->request('DELETE', '/api/phonebookEntries/16');
+        $this->assertTrue($client->getResponse()->isSuccessful()); //Deleted successfully
+        $client->request('GET', '/api/phonebookEntries/getPersonal');
+        $this->assertFalse($client->getResponse()->isSuccessful()); //No personal entry found
     }
 }

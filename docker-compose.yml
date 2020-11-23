@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  mysql:
+    container_name: db_phonebook
+    image: mysql:5.7
+    restart: on-failure
+    ports:
+      - 3307:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: mysqlPass
+      MYSQL_USER: mysqlUser
+      MYSQL_PASSWORD: mysqlPass
+    expose:
+      - 3307
+    entrypoint:
+      sh -c "
+      echo 'CREATE DATABASE IF NOT EXISTS `BA-phonebook_test`;
+      CREATE DATABASE IF NOT EXISTS `BA-phonebook`;' > /docker-entrypoint-initdb.d/init.sql;
+      /usr/local/bin/docker-entrypoint.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+      "
+    networks:
+      - ba-phonebook
+
+
+  nginx:
+    container_name: nginx_phonebook
+    image: nginx:1.19.0-alpine
+    restart: on-failure
+    volumes:
+      - './public:/usr/src/app'
+      - './docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro'
+    ports:
+      - '81:80'
+    depends_on:
+      - php
+    networks:
+      - ba-phonebook
+  php:
+    container_name: php_phonebook
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    volumes:
+      - './:/usr/src/app'
+    restart: on-failure
+    user: 1000:1000
+    networks:
+      - ba-phonebook
+
+networks:
+  ba-phonebook:
+    driver: bridge

@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\AccessorOrder;
 use JMS\Serializer\Annotation\Groups;
 use JMS\Serializer\Annotation\VirtualProperty;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -16,6 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     exp="object.getUserId()"
  *  )
  * @AccessorOrder("custom", custom = {"id", "userId", "firstName", "lastName", "phoneNumber"})
+ * @UniqueEntity("phoneNumber")
  */
 class PhonebookEntry
 {
@@ -58,10 +60,10 @@ class PhonebookEntry
     private $lastName;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
      * @Assert\NotBlank
      * @Assert\Regex(
-     *     pattern = "/(86|\+3706)\d{3}\d{4}/",
+     *     pattern = "/(\+3706)\d{3}\d{4}/",
      *     message = "Invalid phone number format"
      *     )
      * @Groups({"list_phonebookEntries", "show_personalEntry"})

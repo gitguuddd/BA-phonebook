@@ -68,9 +68,11 @@ class ApplicationAvailabilityFunctionalTest extends WebTestCase
     {
         yield ['/api/phonebookEntries/'];
         yield ['/api/phonebookEntries/16'];
+        yield ['/api/phonebookEntries/getPersonal'];
         yield ['/api/friendRequests/getSentRequests'];
         yield ['/api/friendRequests/getReceivedRequests'];
         yield ['/api/friendRequests/inviteOptions'];
+        yield ['/api/friendRequests/inviteSuggestions'];
     }
 
     public function postUrlProvider()

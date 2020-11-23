@@ -35,9 +35,9 @@ class FriendRequestControllerTest extends WebTestCase
         $client->request('POST', '/api/friendRequests/send/2');
         $this->assertFalse($client->getResponse()->isSuccessful()); //Can't send a request to a friend
         $client->request('POST', '/api/friendRequests/send/7');
-        $this->assertFalse($client->getResponse()->isSuccessful()); //Can't send a request to a person with existing common friend request entry (received)
+        $this->assertFalse($client->getResponse()->isSuccessful()); //Can't send a request to a person with existing mutual friend request entry (received)
         $client->request('POST', '/api/friendRequests/send/10');
-        $this->assertFalse($client->getResponse()->isSuccessful()); //Can't send a request to a person with existing common friend request entry (sent)
+        $this->assertFalse($client->getResponse()->isSuccessful()); //Can't send a request to a person with existing mutual friend request entry (sent)
         $client->request('GET', '/api/friendRequests/getSentRequests');
         $this->assertCount(3, json_decode($client->getResponse()->getContent())); //Sent exactly 3 friend requests
         $client->request('POST', '/api/friendRequests/send/5');
@@ -83,13 +83,13 @@ class FriendRequestControllerTest extends WebTestCase
         $client->request('POST', '/api/friendRequests/accept/400');
         $this->assertFalse($client->getResponse()->isSuccessful()); //Friend request doesn't exist
         $client->request('GET', '/api/phonebookEntries/');
-        $entries = json_decode($client->getResponse()->getContent())[0];
-        $this->assertCount(4, $entries->my_friends); //Contains exactly 3 friend associations
+        $entries = json_decode($client->getResponse()->getContent());
+        $this->assertCount(4, $entries); //Contains exactly 4 friend associations
         $client->request('POST', '/api/friendRequests/accept/3');
         $this->assertTrue($client->getResponse()->isSuccessful()); //Friend request accepted successfully
         $client->request('GET', '/api/phonebookEntries/');
-        $entries = json_decode($client->getResponse()->getContent())[0];
-        $this->assertCount(5, $entries->my_friends); //Contains exactly 4 friend associations
+        $entries = json_decode($client->getResponse()->getContent());
+        $this->assertCount(5, $entries); //Contains exactly 5 friend associations
         $client->request('GET', '/api/friendRequests/getReceivedRequests');
         $this->assertCount(1, json_decode($client->getResponse()->getContent())); //Received exactly 1 friend request
     }
@@ -108,6 +108,28 @@ class FriendRequestControllerTest extends WebTestCase
         $this->assertTrue($client->getResponse()->isSuccessful()); //Sharing stopped successfully
         $client->request('GET', '/api/friendRequests/inviteOptions');
         $this->assertCount(6, json_decode($client->getResponse()->getContent())); //Received exactly 6 invite options
+
+    }
+
+    public function testGetInviteSuggestions()
+    {
+        $authFetcher = new AuthorizedClientFetcher();
+        $client = $authFetcher->createAuthorizedClient();
+        $client->request('GET', '/api/friendRequests/inviteSuggestions');
+        $response = [];
+        foreach (json_decode($client->getResponse()->getContent()) as $object) {
+            $response[] = (array)$object;
+        }
+        $this->assertCount(5, $response); //Received exactly 5 invite options
+        $this->assertEquals(2, $response[0]['mutual_friends']); //array sorted by mutual friends count desc
+        $client->request('POST', '/api/friendRequests/send/' . $response[0]['user_id']);
+        $this->assertTrue($client->getResponse()->isSuccessful()); //Request sent successfully
+        $client->request('GET', '/api/friendRequests/inviteSuggestions');
+        $response = [];
+        foreach (json_decode($client->getResponse()->getContent()) as $object) {
+            $response[] = (array)$object;
+        }
+        $this->assertCount(4, $response); //Received exactly 4 invite options
 
     }
 }

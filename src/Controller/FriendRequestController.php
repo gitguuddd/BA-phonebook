@@ -6,6 +6,7 @@ use App\Entity\FriendRequest;
 use App\Entity\User;
 use App\Repository\FriendRequestRepository;
 use App\Repository\UserRepository;
+use App\Service\NotInIdsFetcher;
 use App\Service\ViolationTransformer;
 use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializationContext;
@@ -176,22 +177,43 @@ class FriendRequestController extends AbstractController
     /**
      * @Route("/inviteOptions", name="_invite_options", methods={"GET"})
      * @param UserRepository $userRepository
+     * @param NotInIdsFetcher $notInIdsFetcher
      * @return Response
      */
-    public function getInvitationOptions(UserRepository $userRepository): Response
+    public function getInvitationOptions(UserRepository $userRepository, NotInIdsFetcher $notInIdsFetcher): Response
     {
         $user = $this->getUser();
-        $friends = $userRepository->findFriends($user->getId());
-        $friendIds = array_column($friends, 'u2_id');
-        $sentRequests = $this->friendRequestRepository->findSentFriendRequests($user->getId(), true);
-        $sentRequestsReceiverIds = array_column($sentRequests, 'u_id');
-        $receivedRequests = $this->friendRequestRepository->findReceivedFriendRequests($user->getId(), true);
-        $receivedRequestsSenderIds = array_column($receivedRequests, 'u_id');
-        $notInIds = array_merge($friendIds, $sentRequestsReceiverIds, $receivedRequestsSenderIds);
-        $notInIds[] = $user->getId();
+        $notInIds = $notInIdsFetcher->fetchNotInIds($user, $this->friendRequestRepository, $userRepository);
         $inviteOptions = $this->friendRequestRepository->findPhonebookInviteOptions($notInIds);
         $json = $this->serializer->serialize($inviteOptions, 'json', SerializationContext::create()->setGroups(array('list_phonebookInviteOptions')));
         return new Response($json);
+    }
+
+    /**
+     * @Route("/inviteSuggestions", name="_invite_suggestions", methods={"GET"})
+     * @param UserRepository $userRepository
+     * @param NotInIdsFetcher $notInIdsFetcher
+     * @return Response
+     */
+    public function getInvitationSuggestions(UserRepository $userRepository, NotInIdsFetcher $notInIdsFetcher): Response
+    {
+        $user = $this->getUser();
+        $notInIds = $notInIdsFetcher->fetchNotInIds($user, $this->friendRequestRepository, $userRepository);
+        $suggestions = $this->friendRequestRepository->findPhonebookSuggestions($user->getId(), $notInIds);
+        $sugestionsUserIds = array_column($suggestions, 'u3_id');
+        $suggestionsWithCounts = array_count_values($sugestionsUserIds);
+        $mappedSuggestions = [];
+        foreach ($suggestionsWithCounts as $userId => $count) {
+            $mappedSuggestions[] = [
+                'user_id' => $userId,
+                'mutual_friends' => $count
+            ];
+        }
+        usort($mappedSuggestions, function ($a, $b) {
+            return $b['mutual_friends'] - $a['mutual_friends'];
+        });
+        return new Response(json_encode($mappedSuggestions));
 
     }
+
 }

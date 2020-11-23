@@ -47,7 +47,7 @@ class PhonebookEntryController extends AbstractController
     {
         $user = $this->getUser();
         $phonebookEntries = $phonebookEntryRepository->findFriendPhonebookEntries($user->getId());
-        $json = $this->serializer->serialize($phonebookEntries, 'json', SerializationContext::create()->setGroups(array('list_phonebookEntries')));
+        $json = $this->serializer->serialize($phonebookEntries, 'json', SerializationContext::create()->setGroups(array('list_phonebookEntries', 'show_phonebookEntry'))->enableMaxDepthChecks());
         return new Response($json);
     }
 
@@ -224,6 +224,29 @@ class PhonebookEntryController extends AbstractController
         $this->em->flush();
 
         return new Response('OK');
+
+    }
+
+    /**
+     * @Route("/getPersonal", name="_get_personal", methods={"GET"}, priority=1)
+     * @param UserRepository $userRepository
+     * @param PhonebookEntryRepository $phonebookEntryRepository
+     * @return Response
+     */
+    public function getPersonalEntry(PhonebookEntryRepository $phonebookEntryRepository): Response
+    {
+        $user = $this->getUser();
+        $phonebookEntry = $phonebookEntryRepository->findOneBy([
+            'user' => $user
+        ]);
+        if (is_null($phonebookEntry)) {
+            $data = [
+                'errors' => "Phonebook entry not found"
+            ];
+            return new Response(json_encode($data), 404);
+        }
+        $json = $this->serializer->serialize($phonebookEntry, 'json', SerializationContext::create()->setGroups(array('list_phonebookEntries', 'show_phonebookEntry')));
+        return new Response($json);
 
     }
 

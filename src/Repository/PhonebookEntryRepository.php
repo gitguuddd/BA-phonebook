@@ -24,15 +24,32 @@ class PhonebookEntryRepository extends ServiceEntityRepository
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb
             ->select([
-                'u', 'u2', 'pe'
+                'u', 'u2'
             ])
             ->from('App\Entity\User', 'u')
             ->innerJoin('u.myFriends', 'u2')
-            ->innerJoin('u2.phonebookEntry', 'pe')
             ->where('u.id = :userId')
             ->setParameter('userId', $userId);
         $query = $qb->getQuery();
+        $resultIds = [];
+        $results = array((array)$query->getScalarResult());
+        if (!is_null($results[0])) {
+            foreach ($results[0] as $result) {
+                $resultIds[] = $result["u2_id"];
+            }
+        }
 
+        $qb2 = $this->getEntityManager()->createQueryBuilder();
+        $qb2
+            ->select(
+                'pe')
+            ->from('App\Entity\PhonebookEntry', 'pe')
+            ->where('IDENTITY(pe.user) IN(:resultIds)')
+            ->andWhere('IDENTITY(pe.user) != :userId')
+            ->setParameter('userId', $userId)
+            ->setParameter('resultIds', $resultIds);
+        $query = $qb2->getQuery();
+        //FIXME: VERY HACKY, but works for now
         return $query->execute();
 
     }

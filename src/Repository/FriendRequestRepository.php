@@ -72,4 +72,22 @@ class FriendRequestRepository extends ServiceEntityRepository
         $query = $qb->getQuery();
         return $query->execute();
     }
+
+    public function findPhonebookSuggestions($userId, $notInIds): array
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb
+            ->select([
+                'u', 'u2', 'u3'
+            ])
+            ->from('App\Entity\User', 'u')
+            ->innerJoin('u.myFriends', 'u2')
+            ->innerJoin('u2.myFriends', 'u3')
+            ->where('u.id = :userId')
+            ->andWhere($qb->expr()->notIn('u3.id', $notInIds))
+            ->setParameter('userId', $userId);
+
+        $query = $qb->getQuery();
+        return $query->getScalarResult();
+    }
 }
