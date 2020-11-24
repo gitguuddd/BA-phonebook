@@ -76,8 +76,8 @@ The tests can be run with the use of this command: ```docker exec -ti php_phoneb
 
 ## Choosing between docker and local environment
 
-Due to issues with ```.dockerignore``` file, docker is unable to ignore .env files. Because of this problem only one environment should be used at a time. 
-If you use ```.env.local``` or ```.env.test.local``` for the local configuration - delete these files before running docker, othwerwise the docker configuration containing default ```.env``` and ```.env.test``` files will be overwritten and the php container won't be able to communicate with the Mysql container.
+Due to issues with ```.dockerignore``` file, docker is unable to ignore ```.env``` files. Because of this problem only one environment should be used at a time. 
+If you use ```.env.local``` or ```.env.test.local``` for the local configuration - delete these files before running docker, otherwise the docker configuration containing default ```.env``` and ```.env.test``` files will be overwritten and the php container won't be able to communicate with the Mysql container.
 
 ---
 
