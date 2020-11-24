@@ -31,7 +31,7 @@ Create a phone book web application
 1. Clone repository ```$ git clone https://github.com/gitguuddd/BA-phonebook.git``` or ```$ git clone git@github.com:gitguuddd/BA-phonebook.git``` if you're using SSH
 2. ```cd``` to ```BA-phonebook``` folder
 3. Ensure that both ports ```3307``` (used for Mysql) and ```81``` (used for nginx) aren't in use on your system
-4. Run ```./init.sh```, when asked for pem passphrase use the ```JWT_PASSPHRASE``` provided in env files ```.env``` and ```.env.test```. Default ```bf1c7cb4ffe10b1b82db464c3cfc206a```
+4. Run ```./init.sh```, when asked for pem passphrase use the ```JWT_PASSPHRASE``` provided in env files ```.env``` and ```.env.test```. Default values is ```bf1c7cb4ffe10b1b82db464c3cfc206a```
 5.  **Optional:** load the fixture data onto the main database ```docker exec -ti php_phonebook php bin/console doctrine:fixtures:load```.
  By loading the data onto the main database you'll be able to use all API endpoints in the postman collection with just minor adjustments.
 
