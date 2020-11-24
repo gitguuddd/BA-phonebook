@@ -1,4 +1,5 @@
 #!/bin/bash
+composer update --no-interaction
 docker-compose build
 docker-compose up -d
 docker exec -ti php_phonebook mkdir -p config/jwt
