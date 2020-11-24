@@ -77,7 +77,7 @@ If you use ```.env.local``` or ```.env.test.local``` for the local configuration
 
 ## Changelog
 
-### [v1.1.1](https://github.com/gitguuddd/BA-phonebook/releases/tag/v1.1.1) - (2020-11-24)
+### [v1.1.2](https://github.com/gitguuddd/BA-phonebook/releases/tag/v1.1.2) - (2020-11-24)
 
 **Changed**
 - README.md
