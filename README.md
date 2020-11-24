@@ -71,6 +71,7 @@ The tests can be run with the use of this command: ```docker exec -ti php_phoneb
  All API routes, except register and login,  are **authorized** by a ```JWT``` token - the token received after logging in should be parsed into the authorization tab **Bearer token** type field. Below is the link to the published, Postman compatible, application endpoints` documentation. Below is also the link to a json file, which can be used to import application API endpoints collection into the Postman tool.
 
 [Application endpoints documentation](https://documenter.getpostman.com/view/5871347/TVewYPtu)
+
 [Postman export file](https://www.dropbox.com/s/mpud0lluo59j7wj/BA-phonebook%20API.postman_collection.json?dl=0)
 
 ---
