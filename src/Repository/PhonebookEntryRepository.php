@@ -33,10 +33,11 @@ class PhonebookEntryRepository extends ServiceEntityRepository
         $query = $qb->getQuery();
         $resultIds = [];
         $results = array((array)$query->getScalarResult());
-        if (!is_null($results[0])) {
-            foreach ($results[0] as $result) {
-                $resultIds[] = $result["u2_id"];
-            }
+        if (is_null($results[0])) {
+            return [];
+        }
+        foreach ($results[0] as $result) {
+            $resultIds[] = $result["u2_id"];
         }
 
         $qb2 = $this->getEntityManager()->createQueryBuilder();

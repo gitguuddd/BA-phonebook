@@ -154,7 +154,7 @@ class FriendRequestController extends AbstractController
         $user = $this->getUser();
         if (!$friendRequest) {
             $data = [
-                'errors' => "Phonebook entry not found"
+                'errors' => "Friend request not found"
             ];
             return new Response(json_encode($data), 404);
         } elseif ($user->getId() != $friendRequest->getReceiverId()) {

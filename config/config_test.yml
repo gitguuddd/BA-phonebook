@@ -1,7 +1,0 @@
-doctrine:
-  # ...
-  dbal:
-    host:     localhost
-    dbname:   BA-phonebook_test
-    user:     Root
-    password: Minde2314`
