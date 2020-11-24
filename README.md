@@ -31,20 +31,11 @@ Create a phone book web application
 1. Clone repository ```$ git clone https://github.com/gitguuddd/BA-phonebook.git``` or ```$ git clone git@github.com:gitguuddd/BA-phonebook.git``` if you're using SSH
 2. ```cd``` to ```BA-phonebook``` folder
 3. Ensure that both ports ```3307``` (used for Mysql) and ```81``` (used for nginx) aren't in use on your system
-4. Run ```docker-compose build```
-5. Run ```docker-compose up -d```
-6. Generate private ```JWT``` key: ```docker exec -ti php_phonebook openssl genpkey -out config/jwt/private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096```.
- When prompted for PEM passphrase use the one provided in ```.env``` and ```.env.test``` files. 
- Default passphrase is ```bf1c7cb4ffe10b1b82db464c3cfc206a```
-7. Generate public ```JWT``` key: ```docker exec -ti php_phonebook openssl pkey -in config/jwt/private.pem -out config/jwt/public.pem -pubout```.
-Use the same PEM passphrase used while generating the private key.
-8. Migrate the schemas of main database ```docker exec -ti php_phonebook php bin/console doctrine:migrations:migrate``` and test database ```docker exec -ti php_phonebook php bin/console doctrine:migrations:migrate
- --env=test```. Accept all prompts.
-9. Load the fixture data onto the test database ```docker exec -ti php_phonebook php bin/console doctrine:fixtures:load --env=test```. Accept all prompts.
-10. **Optional:** load the fixture data onto the main database ```docker exec -ti php_phonebook php bin/console doctrine:fixtures:load```.
+4. Run ```./init.sh```, when asked for pem passphrase use the ```JWT_PASSPHRASE``` provided in env files ```.env``` and ```.env.test```. Default ```bf1c7cb4ffe10b1b82db464c3cfc206a```
+5.  **Optional:** load the fixture data onto the main database ```docker exec -ti php_phonebook php bin/console doctrine:fixtures:load```.
  By loading the data onto the main database you'll be able to use all API endpoints in the postman collection with just minor adjustments.
 
-**Important note:** make sure the fixture data is loaded only once for each database - the tests and API collection contain hardcoded entry ids. After loading the fixture data a second time these ids would become invalid.
+**Important note:** make sure the fixture data is loaded only once for each database (test env is already loaded during init.sh)- the tests and API collection contain hardcoded entry ids. After loading the fixture data a second time these ids would become invalid.
 
 ---
 ## Testing
@@ -81,9 +72,19 @@ If you use ```.env.local``` or ```.env.test.local``` for the local configuration
 
 ---
 
+--
+
 ## Changelog
 
-[v1.0](https://github.com/gitguuddd/BA-phonebook/releases/tag/v1.0) - (2020-11-23)
+### [v1.1](https://github.com/gitguuddd/BA-phonebook/releases/tag/v1.1) - (2020-11-24)
+
+**Added**
+- init.sh
+
+**Changed**
+- README.md
+
+### [v1.0](https://github.com/gitguuddd/BA-phonebook/releases/tag/v1.0) - (2020-11-23)
 
 **Added**
 - README.md
