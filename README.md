@@ -59,16 +59,18 @@ The tests can be run with the use of this command: ```docker exec -ti php_phoneb
 ## Using the application
 
  The web application contains ```16``` API endpoints. Due to the nature of the application (pure API), API testing platforms such as Postman should be used to interact with the application.
- All API routes, except register and login,  are **authorized** by a ```JWT``` token - the token received after logging in should be parsed into the authorization tab **Bearer token** type field. Below is the link to the published, Postman compatible, application endpoints` documentation.
+ All API routes, except register and login,  are **authorized** by a ```JWT``` token - the token received after logging in should be parsed into the authorization tab **Bearer token** type field. Below is the link to the published, Postman compatible, application endpoints` documentation. Below is also the link to a json file, which can be used to import application API endpoints collection into the Postman tool.
 
 [Application endpoints documentation](https://documenter.getpostman.com/view/5871347/TVewYPtu)
+
+[Postman export file](https://www.dropbox.com/s/mpud0lluo59j7wj/BA-phonebook%20API.postman_collection.json?dl=0)
 
 ---
 
 ## Choosing between docker and local environment
 
-Due to issues with ```.dockerignore``` file, docker is unable to ignore .env files. Because of this problem only one environment should be used at a time. 
-If you use ```.env.local``` or ```.env.test.local``` for the local configuration - delete these files before running docker, othwerwise the docker configuration containing default ```.env``` and ```.env.test``` files will be overwritten and the php container won't be able to communicate with the Mysql container.
+Due to issues with ```.dockerignore``` file, docker is unable to ignore ```.env``` files. Because of this problem only one environment should be used at a time. 
+If you use ```.env.local``` or ```.env.test.local``` for the local configuration - delete these files before running docker, otherwise the docker configuration containing default ```.env``` and ```.env.test``` files will be overwritten and the php container won't be able to communicate with the Mysql container.
 
 ---
 
